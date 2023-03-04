@@ -1,8 +1,10 @@
 package com.example.task.model;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 
-@Data
+@Getter
+@Builder
 public class TaskResult {
 
     int position;
