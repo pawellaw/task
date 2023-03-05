@@ -48,6 +48,7 @@ class TaskServiceSpec extends Specification {
             "AAB"                                   | "B"     | 2                | 0
             "AAB"                                   | "C"     | 0                | 1
             "A" * 100 + "B" * 100 + "C" * 100 + "D" | "D"     | 300              | 0
+            "A" * 100 + "B" * 100 + "C" * 100 + "D" | "CD"    | 299              | 0
 
     }
 
