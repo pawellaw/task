@@ -28,16 +28,21 @@ class TaskApplicationTests {
 
     @Test
     void asyncProcessing() {
+        final long completedTaskCount = taskExecutor.getThreadPoolExecutor().getCompletedTaskCount();
         String aaa = "AAA";
-        for (int i = 0; i <= 15; i++) {
+        final int taskCount = 15;
+        for (int i = 0; i <= taskCount; i++) {
             taskService.findBestMatchAsync(sampleTaskInputData(aaa.repeat(i)));
         }
-        Awaitility.await().until(() -> taskExecutor.getThreadPoolExecutor().getCompletedTaskCount() == 15);
+        Awaitility.await()
+                .until(() -> taskExecutor.getThreadPoolExecutor()
+                        .getCompletedTaskCount() == completedTaskCount + taskCount);
     }
 
     @Test
     void statusCheck() {
         long completedTaskCount = taskExecutor.getThreadPoolExecutor().getCompletedTaskCount();
+        System.out.println("completedTaskCount = " + completedTaskCount);
         String aaa = "AAA";
         String id = "id";
 
@@ -49,7 +54,7 @@ class TaskApplicationTests {
                 .until(() -> taskExecutor.getThreadPoolExecutor().getCompletedTaskCount() == completedTaskCount + 1);
 
         TaskStatus taskStatus = taskService.getTaskStatus(id);
-        Assert.hasText(taskStatus.getProgress(), "100%");
+        Assert.hasText(taskStatus.progres(), "100%");
     }
 
     private TaskInputData sampleTaskInputData(final String input) {
@@ -57,10 +62,6 @@ class TaskApplicationTests {
     }
 
     private TaskInputData sampleTaskInputData(final String input, final String id) {
-        return TaskInputData.builder()
-                .input(input + "B")
-                .pattern("B")
-                .id(id)
-                .build();
+        return new TaskInputData(id, input + "B", "B");
     }
 }

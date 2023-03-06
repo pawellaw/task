@@ -3,7 +3,6 @@ package com.example.task.service;
 import com.example.task.model.TaskInputData;
 import com.example.task.model.TaskResult;
 import com.example.task.model.TaskStatus;
-import lombok.SneakyThrows;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -25,13 +24,12 @@ public class TaskServiceImpl implements TaskService {
         System.out.println("bestMatch = " + bestMatch);
     }
 
-    @SneakyThrows
     @Override
     public TaskResult findBestMatch(final TaskInputData taskInputData) {
         System.out.println("Invoking an asynchronous method. "
                 + Thread.currentThread().getName());
-        final String input = taskInputData.getInput();
-        final String pattern = taskInputData.getPattern();
+        final String input = taskInputData.input();
+        final String pattern = taskInputData.pattern();
         int inputLength = input.length();
         int patternLength = pattern.length();
         int minTypos = Integer.MAX_VALUE;
@@ -41,12 +39,12 @@ public class TaskServiceImpl implements TaskService {
 
         final int endOfIteration = inputLength - patternLength;
         for (int i = 0; i <= endOfIteration; i++) {
-            final long sleepTime = ThreadLocalRandom.current().nextInt(0, 100);
+            final long sleepTime = ThreadLocalRandom.current().nextInt(0, 1000);
 
             final double progress = (double) i / endOfIteration;
             System.out.println("Progress = " + progress + ", SleepTime: " + sleepTime);
-            Thread.sleep(sleepTime);
-            statusMap.put(taskInputData.getId(), progress);
+            sleep(sleepTime);
+            statusMap.put(taskInputData.id(), progress);
             int typos = checkTypos(input.substring(i, patternLength + i), pattern);
             if (typos == 0) {
                 return finishProcessing(i, typos);
@@ -59,6 +57,14 @@ public class TaskServiceImpl implements TaskService {
         return finishProcessing(position, minTypos);
     }
 
+    private static void sleep(final long sleepTime) {
+        try {
+            Thread.sleep(sleepTime);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private TaskResult finishProcessing(final int position, final int typos) {
         System.out.println("Task Finished: " + Thread.currentThread().getName());
         return taskResult(position, typos);
@@ -68,18 +74,12 @@ public class TaskServiceImpl implements TaskService {
     public TaskStatus getTaskStatus(String id) {
         final Double progress = statusMap.get(id);
         return progress != null ?
-                TaskStatus.builder()
-                        .id(id)
-                        .progress(DECIMAL_FORMAT.format(progress))
-                        .build()
+                new TaskStatus(id, DECIMAL_FORMAT.format(progress))
                 : null;
     }
 
     private TaskResult taskResult(final int position, final int typos) {
-        return TaskResult.builder()
-                .position(position)
-                .typos(typos)
-                .build();
+        return new TaskResult(position, typos);
     }
 
     private int checkTypos(final String substring, final String pattern) {

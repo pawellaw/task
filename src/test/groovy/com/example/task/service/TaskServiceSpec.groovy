@@ -14,8 +14,8 @@ class TaskServiceSpec extends Specification {
             def taskResult = taskService.findBestMatch(taskInputData)
         then:
             with(taskResult) {
-                position == expectedPosition
-                typos == expectedTypos
+                position() == expectedPosition
+                typos() == expectedTypos
             }
         where:
             input     | pattern | expectedPosition | expectedTypos
@@ -34,25 +34,25 @@ class TaskServiceSpec extends Specification {
             def taskResult = taskService.findBestMatch(taskInputData)
         then:
             with(taskResult) {
-                position == expectedPosition
-                typos == expectedTypos
+                position() == expectedPosition
+                typos() == expectedTypos
             }
         where:
-            input                                   | pattern | expectedPosition | expectedTypos
-            "A"                                     | "A"     | 0                | 0
-            "A"                                     | "B"     | 0                | 1
-            "AA"                                    | "A"     | 0                | 0
-            "AA"                                    | "B"     | 0                | 1
-            "AB"                                    | "B"     | 1                | 0
-            "BAB"                                   | "B"     | 0                | 0
-            "AAB"                                   | "B"     | 2                | 0
-            "AAB"                                   | "C"     | 0                | 1
-            "A" * 100 + "B" * 100 + "C" * 100 + "D" | "D"     | 300              | 0
-            "A" * 100 + "B" * 100 + "C" * 100 + "D" | "CD"    | 299              | 0
+            input                                | pattern | expectedPosition | expectedTypos
+            "A"                                  | "A"     | 0                | 0
+            "A"                                  | "B"     | 0                | 1
+            "AA"                                 | "A"     | 0                | 0
+            "AA"                                 | "B"     | 0                | 1
+            "AB"                                 | "B"     | 1                | 0
+            "BAB"                                | "B"     | 0                | 0
+            "AAB"                                | "B"     | 2                | 0
+            "AAB"                                | "C"     | 0                | 1
+            "A" * 10 + "B" * 10 + "C" * 10 + "D" | "D"     | 30               | 0
+            "A" * 10 + "B" * 10 + "C" * 10 + "D" | "CD"    | 29               | 0
 
     }
 
     TaskInputData createInputData(String input, String pattern) {
-        TaskInputData.builder().input(input).pattern(pattern).build()
+        new TaskInputData("", input, pattern)
     }
 }
