@@ -6,25 +6,6 @@
 	},
 	"item": [
 		{
-			"name": "Get Tasks",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "localhost:8080/api/tasks",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"tasks"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Create Task",
 			"event": [
 				{
@@ -80,6 +61,26 @@
 						"api",
 						"tasks",
 						"{{taskId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Tasks",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tasks",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tasks"
 					]
 				}
 			},

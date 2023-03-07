@@ -1,3 +1,7 @@
 package com.example.task.model;
 
-public record TaskStatus(String id, String progres) {}
+public enum TaskStatus {
+    CREATED,
+    INPROGRESS,
+    FINISHED
+}

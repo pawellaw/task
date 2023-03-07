@@ -1,27 +1,45 @@
 package com.example.task.service;
 
+import com.example.task.model.TaskInfo;
 import com.example.task.model.TaskInputData;
 import com.example.task.model.TaskResult;
-import com.example.task.model.TaskStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.text.DecimalFormat;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 public class TaskServiceImpl implements TaskService {
 
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#%");
-    private final Map<String, Double> statusMap = new HashMap<>();
+    private final Map<String, TaskInfo> tasks = new ConcurrentHashMap<>();
 
     @Async
     @Override
+    public void createTask(final String taskId, final String input, final String pattern) {
+        TaskInfo taskInfo = new TaskInfo(taskId, input, pattern);
+        tasks.put(taskId, taskInfo);
+        TaskInputData taskInputData = new TaskInputData(taskId, input, pattern);
+        findBestMatchAsync(taskInputData);
+    }
+
+    @Override
     public void findBestMatchAsync(final TaskInputData taskInputData) {
-        final TaskResult bestMatch = findBestMatch(taskInputData);
-        System.out.println("bestMatch = " + bestMatch);
+        startProgressOnTask(taskInputData.id());
+        final TaskResult taskResult = findBestMatch(taskInputData);
+        System.out.println("taskResult = " + taskResult);
+        finishTask(taskInputData.id(), taskResult);
+    }
+
+    private void startProgressOnTask(final String taskId) {
+        tasks.get(taskId).startProgress();
+    }
+
+
+    private void finishTask(final String taskId, final TaskResult taskResult) {
+        tasks.get(taskId).finishProgress(taskResult.position(), taskResult.typos());
     }
 
     @Override
@@ -30,6 +48,8 @@ public class TaskServiceImpl implements TaskService {
                 + Thread.currentThread().getName());
         final String input = taskInputData.input();
         final String pattern = taskInputData.pattern();
+        final String taskId = taskInputData.id();
+
         int inputLength = input.length();
         int patternLength = pattern.length();
         int minTypos = Integer.MAX_VALUE;
@@ -44,7 +64,8 @@ public class TaskServiceImpl implements TaskService {
             final double progress = (double) i / endOfIteration;
             System.out.println("Progress = " + progress + ", SleepTime: " + sleepTime);
             sleep(sleepTime);
-            statusMap.put(taskInputData.id(), progress);
+            tasks.get(taskId).updateProgress(progress);
+
             int typos = checkTypos(input.substring(i, patternLength + i), pattern);
             if (typos == 0) {
                 return finishProcessing(i, typos);
@@ -71,11 +92,13 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskStatus getTaskStatus(String id) {
-        final Double progress = statusMap.get(id);
-        return progress != null ?
-                new TaskStatus(id, DECIMAL_FORMAT.format(progress))
-                : null;
+    public TaskInfo getTaskInfo(String taskId) {
+        return tasks.get(taskId);
+    }
+
+    @Override
+    public List<TaskInfo> getTasksList() {
+        return tasks.values().stream().toList();
     }
 
     private TaskResult taskResult(final int position, final int typos) {
