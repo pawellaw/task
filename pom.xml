@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.0.4</version>
-        <relativePath /> <!-- lookup parent from repository -->
+        <relativePath />
     </parent>
     <groupId>com.example</groupId>
     <artifactId>task</artifactId>
@@ -48,15 +48,16 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <!-- Build an executable JAR -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
                 <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.example.task.TaskApplication</mainClass>
+                        </manifest>
+                    </archive>
                 </configuration>
             </plugin>
             <plugin>
@@ -81,6 +82,17 @@
                         <include>**/*Tests.java</include>
                     </includes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

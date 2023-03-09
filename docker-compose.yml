@@ -1,0 +1,14 @@
+version: '2'
+services:
+  message-server:
+    container_name: task_app
+    build:
+      dockerfile: Dockerfile
+    image: task_app:latest
+    ports:
+      - 8888:8080
+    networks:
+      - spring-cloud-network
+networks:
+  spring-cloud-network:
+    driver: bridge
