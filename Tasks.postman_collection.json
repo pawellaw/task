@@ -24,7 +24,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"input\": \"AAAAASSSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC\",\n    \"pattern\": \"C\"\n}",
+					"raw": "{\n    \"input\": \"AAAAAAAAAAAAC\",\n    \"pattern\": \"C\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -32,11 +32,12 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:8080/api/tasks",
+					"raw": "http://localhost:8888/api/tasks",
+					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8888",
 					"path": [
 						"api",
 						"tasks"
@@ -51,12 +52,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/api/tasks/{{taskId}}",
+					"raw": "http://localhost:8888/api/tasks/{{taskId}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8888",
 					"path": [
 						"api",
 						"tasks",
@@ -72,12 +73,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/api/tasks",
+					"raw": "http://localhost:8888/api/tasks",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "8888",
 					"path": [
 						"api",
 						"tasks"

@@ -1,18 +1,22 @@
 package com.example.task.service
 
+import com.example.task.model.TaskInfo
 import com.example.task.model.TaskInputData
 import spock.lang.Specification
 
-class TaskServiceSpec extends Specification {
+class AlgorithmProcessorSpec extends Specification {
 
-    TaskService taskService = new TaskServiceImpl()
+    TaskStorage taskStorage = new TaskStorage()
+    AlgorithmProcessor algorithmProcessor = new AlgorithmProcessor(taskStorage)
 
     def "Should find best Match"() {
         given:
-            def taskId = taskService.createTask(input, pattern)
+            String taskId = UUID.randomUUID().toString()
+            TaskInfo taskInfo = new TaskInfo(taskId, input, pattern)
+            taskStorage.put(taskId, taskInfo)
             def taskInputData = createInputData(taskId, input, pattern)
         when:
-            def taskResult = taskService.findBestMatch(taskInputData)
+            def taskResult = algorithmProcessor.findBestMatch(taskInputData)
         then:
             with(taskResult) {
                 position() == expectedPosition
@@ -25,15 +29,16 @@ class TaskServiceSpec extends Specification {
             "ABCDEFG" | "CFG"   | 4                | 1
             "ABCABC"  | "ABC"   | 0                | 0
             "ABCDEFG" | "TDD"   | 1                | 2
-
     }
 
     def "Scenarios for one letter pattern"() {
         given:
-            def taskId = taskService.createTask(input, pattern)
+            String taskId = UUID.randomUUID().toString()
+            TaskInfo taskInfo = new TaskInfo(taskId, input, pattern)
+            taskStorage.put(taskId, taskInfo)
             def taskInputData = createInputData(taskId, input, pattern)
         when:
-            def taskResult = taskService.findBestMatch(taskInputData)
+            def taskResult = algorithmProcessor.findBestMatch(taskInputData)
         then:
             with(taskResult) {
                 position() == expectedPosition

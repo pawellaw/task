@@ -1,8 +1,6 @@
 package com.example.task.service;
 
 import com.example.task.model.TaskInfo;
-import com.example.task.model.TaskInputData;
-import com.example.task.model.TaskResult;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
@@ -27,13 +25,13 @@ public interface TaskService {
     @Async
     void startAsyncProcessing(String taskId);
 
-    /**
-     * Task algorithm implementation
-     *
-     * @param taskInputData Info about processing Task
-     * @return TaskResult
-     */
-    TaskResult findBestMatch(TaskInputData taskInputData);
+//    /**
+    //     * Task algorithm implementation
+    //     *
+    //     * @param taskInputData Info about processing Task
+    //     * @return TaskResult
+    //     */
+    //    TaskResult findBestMatch(TaskInputData taskInputData);
 
     /**
      * Details about Task

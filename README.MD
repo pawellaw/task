@@ -20,3 +20,10 @@
 
 http://localhost:8888/swagger-ui/index.html
 
+## Postman 
+
+Postman files to import and use:
+
+`New Environment.postman_environment.json`
+`Tasks.postman_collection.json`
+

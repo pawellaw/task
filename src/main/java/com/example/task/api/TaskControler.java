@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -25,12 +27,14 @@ import java.text.DecimalFormat;
 public class TaskControler {
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#%");
+    private final Logger logger = LoggerFactory.getLogger(TaskControler.class);
 
     @Autowired
     private TaskService taskService;
 
     /**
      * Create task and starts asynchronous processing
+     *
      * @param createTaskRequest - Request with pattern and input
      * @return CreateTaskResponse - with cretaed task identifier
      */
@@ -39,6 +43,7 @@ public class TaskControler {
     @ApiResponses(value = {@ApiResponse(responseCode = "400", description = "Request params incorrect values")})
     @Operation(summary = "Creates new task for asynchronous processing")
     public CreateTaskResponse createTask(@Valid @RequestBody CreateTaskRequest createTaskRequest) {
+        logger.info("Recieved CreateTaskRequest" + createTaskRequest);
         final String taskId = taskService.createTask(createTaskRequest.input(), createTaskRequest.pattern());
         taskService.startAsyncProcessing(taskId);
 
@@ -48,6 +53,7 @@ public class TaskControler {
     /**
      * Returns task details based on taskI
      * d
+     *
      * @param taskId - Task identifier
      * @return Task - Task details
      */
@@ -55,24 +61,33 @@ public class TaskControler {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Return all information about created task")
     public Task getTask(@PathVariable String taskId) {
+        logger.info("Recieved request to get Task for taskId " + taskId);
         return taskService.getTaskInfo(taskId).map(this::mapToTask).orElse(null);
     }
 
     /**
      * Rest Api method to return list of all processed tasks
+     *
      * @return GetTasksResponse - response with list of processed tasks
      */
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Return list of all tasks processed and their details")
     public GetTasksResponse getTasks() {
+        logger.info("Recieved request to get Tasks");
         return new GetTasksResponse(taskService.getTasksList().stream().map(this::mapToTask).toList());
     }
 
     private Task mapToTask(final TaskInfo taskInfo) {
-        return new Task(taskInfo.getId(), taskInfo.getInput(), taskInfo.getPattern(),
-                taskInfo.getCreationTime(), taskInfo.getStartProgressTime(), taskInfo.getFinishTime(),
-                taskInfo.getStatus().toString(), DECIMAL_FORMAT.format(taskInfo.getProgress()),
-                String.valueOf(taskInfo.getPosition()), String.valueOf(taskInfo.getTypos()));
+        return new Task(taskInfo.getId(),
+                taskInfo.getInput(),
+                taskInfo.getPattern(),
+                taskInfo.getCreationTime(),
+                taskInfo.getStartProgressTime(),
+                taskInfo.getFinishTime(),
+                taskInfo.getStatus().toString(),
+                DECIMAL_FORMAT.format(taskInfo.getProgress()),
+                String.valueOf(taskInfo.getPosition()),
+                String.valueOf(taskInfo.getTypos()));
     }
 }

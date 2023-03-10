@@ -22,5 +22,12 @@ public class CreateTaskRequest {
         return pattern;
     }
 
+    @Override
+    public String toString() {
+        return "CreateTaskRequest{" +
+                "input='" + input + '\'' +
+                ", pattern='" + pattern + '\'' +
+                '}';
+    }
 }
 

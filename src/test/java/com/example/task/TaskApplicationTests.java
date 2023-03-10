@@ -55,7 +55,6 @@ class TaskApplicationTests {
     @Test
     void statusCheck() {
         long completedTaskCount = taskExecutor.getThreadPoolExecutor().getCompletedTaskCount();
-        System.out.println("completedTaskCount = " + completedTaskCount);
 
         final String input = "AAAB";
         final String pattern = "B";
