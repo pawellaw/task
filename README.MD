@@ -7,16 +7,18 @@
 
 ## Run Tests
 
-`mvn test`
+`./mvnw test`
 
 ## How to run application using docker compose
 
 ### System requirements
 - Java JDK 17
-- Docker + Docker Compose
+- Docker > 20
+- Docker-Compose > 2.15
+- Maven > 3 
 
 ### Commands to run
-`mvn clean package -DskipTests`  
+`./mvnw clean package -DskipTests`  
 
 `docker build --tag=task_app:latest .`
 
