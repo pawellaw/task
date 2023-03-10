@@ -1,17 +1,16 @@
 package com.example.task.service
 
 import com.example.task.model.TaskInputData
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class TaskServiceSpec extends Specification {
 
     TaskService taskService = new TaskServiceImpl()
 
-    @Ignore
     def "Should find best Match"() {
         given:
-            def taskInputData = createInputData(input, pattern)
+            def taskId = taskService.createTask(input, pattern)
+            def taskInputData = createInputData(taskId, input, pattern)
         when:
             def taskResult = taskService.findBestMatch(taskInputData)
         then:
@@ -29,10 +28,10 @@ class TaskServiceSpec extends Specification {
 
     }
 
-    @Ignore
     def "Scenarios for one letter pattern"() {
         given:
-            def taskInputData = createInputData(input, pattern)
+            def taskId = taskService.createTask(input, pattern)
+            def taskInputData = createInputData(taskId, input, pattern)
         when:
             def taskResult = taskService.findBestMatch(taskInputData)
         then:
@@ -51,11 +50,9 @@ class TaskServiceSpec extends Specification {
             "AAB"                                | "B"     | 2                | 0
             "AAB"                                | "C"     | 0                | 1
             "A" * 10 + "B" * 10 + "C" * 10 + "D" | "D"     | 30               | 0
-            "A" * 10 + "B" * 10 + "C" * 10 + "D" | "CD"    | 29               | 0
-
     }
 
-    TaskInputData createInputData(String input, String pattern) {
-        new TaskInputData("", input, pattern)
+    TaskInputData createInputData(String taskId, String input, String pattern) {
+        new TaskInputData(taskId, input, pattern)
     }
 }

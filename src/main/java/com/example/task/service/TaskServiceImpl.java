@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -16,21 +18,28 @@ public class TaskServiceImpl implements TaskService {
 
     private final Map<String, TaskInfo> tasks = new ConcurrentHashMap<>();
 
-    @Async
     @Override
-    public void createTask(final String taskId, final String input, final String pattern) {
+    public String createTask(final String input, final String pattern) {
+        final String taskId = UUID.randomUUID().toString();
         TaskInfo taskInfo = new TaskInfo(taskId, input, pattern);
         tasks.put(taskId, taskInfo);
-        TaskInputData taskInputData = new TaskInputData(taskId, input, pattern);
-        findBestMatchAsync(taskInputData);
+        return taskId;
     }
 
+    @Async
+
     @Override
-    public void findBestMatchAsync(final TaskInputData taskInputData) {
+    public void startAsyncProcessing(final String taskId) {
+        TaskInputData taskInputData = createTaskInputData(taskId);
         startProgressOnTask(taskInputData.id());
         final TaskResult taskResult = findBestMatch(taskInputData);
         System.out.println("taskResult = " + taskResult);
         finishTask(taskInputData.id(), taskResult);
+    }
+
+    private TaskInputData createTaskInputData(final String taskId) {
+        final TaskInfo taskInfo = tasks.get(taskId);
+        return new TaskInputData(taskId, taskInfo.getInput(), taskInfo.getPattern());
     }
 
     private void startProgressOnTask(final String taskId) {
@@ -92,8 +101,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskInfo getTaskInfo(String taskId) {
-        return tasks.get(taskId);
+    public Optional<TaskInfo> getTaskInfo(String taskId) {
+        return Optional.ofNullable(tasks.get(taskId));
     }
 
     @Override

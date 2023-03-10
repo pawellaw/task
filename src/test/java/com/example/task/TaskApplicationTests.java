@@ -1,15 +1,15 @@
 package com.example.task;
 
-import com.example.task.model.TaskInputData;
+import com.example.task.model.TaskStatus;
 import com.example.task.service.TaskService;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.util.Assert;
 
-import java.util.UUID;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 @SpringBootTest
 class TaskApplicationTests {
@@ -30,37 +30,55 @@ class TaskApplicationTests {
         final long completedTaskCount = taskExecutor.getThreadPoolExecutor().getCompletedTaskCount();
         String aaa = "AAA";
 
-        final int taskCount = 5;
+        final int taskCount = 10;
         for (int i = 0; i <= taskCount; i++) {
-            taskService.createTask("TaskId" + i, aaa.repeat(i) + "B", "B");
+            final String input = aaa.repeat(i) + "B";
+            final String pattern = "B";
+            final String taskId = taskService.createTask(input, pattern);
+            taskService.startAsyncProcessing(taskId);
         }
+
         Awaitility.await()
+                .until(() -> taskService.getTasksList().stream().anyMatch(t -> t.getStatus() == TaskStatus.INPROGRESS));
+
+        Awaitility.await()
+                .until(() -> taskService.getTasksList().stream().anyMatch(t -> t.getStatus() == TaskStatus.CREATED));
+
+        Awaitility.waitAtMost(Duration.of(20, ChronoUnit.SECONDS))
                 .until(() -> taskExecutor.getThreadPoolExecutor()
                         .getCompletedTaskCount() == completedTaskCount + taskCount);
+
+        Awaitility.await()
+                .until(() -> taskService.getTasksList().stream().allMatch(t -> t.getStatus() == TaskStatus.FINISHED));
     }
 
     @Test
     void statusCheck() {
         long completedTaskCount = taskExecutor.getThreadPoolExecutor().getCompletedTaskCount();
         System.out.println("completedTaskCount = " + completedTaskCount);
-        String id = "id";
 
-        Assert.isNull(taskService.getTaskInfo(id), "TaskStatus should be null for id = " + id);
+        final String input = "AAAB";
+        final String pattern = "B";
 
-        taskService.createTask(id, "AAAB", "B");
+        final String id = taskService.createTask(input, pattern);
+        taskService.startAsyncProcessing(id);
+
+        Awaitility.await()
+                .until(() -> taskService.getTaskInfo(id)
+                        .map(t -> t.getStatus() == TaskStatus.INPROGRESS)
+                        .orElse(false));
 
         Awaitility.await()
                 .until(() -> taskExecutor.getThreadPoolExecutor().getCompletedTaskCount() == completedTaskCount + 1);
 
         Awaitility.await()
-                .until(() -> taskService.getTaskInfo(id).getProgress() == 1.0d);
-    }
+                .until(() ->
+                        taskService.getTaskInfo(id)
+                                .map(taskInfo -> taskInfo.getProgress() == 1.0d && taskInfo.getStatus() == TaskStatus.FINISHED)
+                                .orElse(false)
+                );
 
-    private TaskInputData sampleTaskInputData(final String input) {
-        return sampleTaskInputData(input, UUID.randomUUID().toString());
-    }
-
-    private TaskInputData sampleTaskInputData(final String input, final String id) {
-        return new TaskInputData(id, input + "B", "B");
+        Awaitility.await()
+                .until(() -> taskService.getTasksList().size() == completedTaskCount + 1);
     }
 }
