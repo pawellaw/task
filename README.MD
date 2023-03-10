@@ -5,22 +5,28 @@
 - Spring Boot 3
 - Tests : Groovy, Spock, JUnit, Awaitility
 
-## Run Tests 
+## Run Tests
 
 `mvn test`
 
 ## How to run application using docker compose
+
+### System requirements
+- Java JDK 17
+- Docker + Docker Compose
+
+### Commands to run
 `mvn clean package -DskipTests`  
 
 `docker build --tag=task_app:latest .`
 
 `docker-compose up`
 
-## OpenAPI Description
+## OpenAPI Description (after application start)
 
 http://localhost:8888/swagger-ui/index.html
 
-## Postman 
+## Postman Collection
 
 Postman files to import and use:
 
