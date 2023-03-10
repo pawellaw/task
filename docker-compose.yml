@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     image: task_app:latest
     ports:
-      - 8888:8080
+      - 8888:8888
     networks:
       - spring-cloud-network
 networks:

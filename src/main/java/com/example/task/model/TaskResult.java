@@ -1,4 +1,3 @@
 package com.example.task.model;
 
-public record TaskResult(int position, int typos) {
-}
+public record TaskResult(int position, int typos) {}
